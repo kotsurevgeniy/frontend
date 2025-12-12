@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>BladeHunters Hub</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{
+      --bg:#0b0b10;
+      --card:#141423;
+      --card2:#10101b;
+      --text:#f4f4fb;
+      --muted:#a0a0b7;
+      --line:rgba(255,255,255,.08);
+      --red:#ff1c1c;
+      --red2:#e10600;
+      --good:#27d18a;
+      --shadow: 0 14px 40px rgba(0,0,0,.45);
+      --r:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:radial-gradient(1200px 600px at 40% -10%, rgba(255,28,28,.18), transparent 55%),
+                 radial-gradient(900px 500px at 85% 0%, rgba(255,28,28,.12), transparent 60%),
+                 var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+    .wrap{max-width:720px;margin:0 auto;padding:16px 14px 110px}
+    .top{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:14px 14px;border:1px solid var(--line);border-radius:22px;background:rgba(20,20,35,.72);backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position:sticky; top:10px; z-index:10;
+    }
+    .brand{display:flex;gap:10px;align-items:center}
+    .logo{
+      width:40px;height:40px;border-radius:12px;
+      background: linear-gradient(135deg, rgba(255,28,28,.95), rgba(225,6,0,.75));
+      box-shadow: 0 10px 25px rgba(255,28,28,.22);
+      display:grid;place-items:center;
+      font-weight:900; letter-spacing:.5px;
+    }
+    .brand h1{font-size:15px;margin:0;line-height:1.1}
+    .brand .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(16,16,27,.65);
+      color:var(--muted); font-size:12px;
+    }
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
+    .grid{display:grid;gap:12px;margin-top:14px}
+    .card{
+      border:1px solid var(--line);border-radius:var(--r);
+      background:linear-gradient(180deg, rgba(20,20,35,.88), rgba(16,16,27,.86));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{padding:14px 14px 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .ttl{margin:0;font-size:14px}
+    .muted{color:var(--muted);font-size:12px}
+    .card .bd{padding:0 14px 14px}
+    .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+    .stat{
+      padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(10,10,18,.55);
+    }
+    .stat .n{font-size:18px;font-weight:900}
+    .stat .t{font-size:11px;color:var(--muted);margin-top:2px}
+    .btn{
+      width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,28,28,.08); color:var(--text); font-weight:800;
+      cursor:pointer;
+    }
+    .btn.primary{
+      background:linear-gradient(135deg, rgba(255,28,28,.98), rgba(225,6,0,.86));
+      border-color: rgba(255,28,28,.35);
+      box-shadow: 0 16px 30px rgba(255,28,28,.18);
+    }
+    .btn.ghost{background:rgba(255,255,255,.04)}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .row{display:flex;gap:10px}
+    .row .btn{flex:1}
+    label{display:block;margin-top:10px;font-size:12px;color:var(--muted)}
+    input, select{
+      width:100%; padding:12px 12px;
+      border-radius:14px;border:1px solid var(--line);
+      background:rgba(10,10,18,.55); color:var(--text);
+      outline:none;
+    }
+    input:focus, select:focus{border-color: rgba(255,28,28,.55)}
+    .nav{
+      position:fixed;left:0;right:0;bottom:0;
+      background:rgba(10,10,16,.75);backdrop-filter: blur(12px);
+      border-top:1px solid var(--line);
+      padding:10px 14px 20px;
+    }
+    .tabs{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .tab{
+      padding:10px 10px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.03);color:var(--muted);
+      font-size:12px; text-align:center; cursor:pointer; user-select:none;
+    }
+    .tab.active{
+      color:var(--text);
+      border-color: rgba(255,28,28,.35);
+      background:rgba(255,28,28,.08);
+      box-shadow: 0 10px 25px rgba(255,28,28,.10);
+    }
+    .list{display:grid;gap:10px;margin-top:10px}
+    .item{
+      padding:12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(10,10,18,.55);
+      display:grid;gap:6px;
+    }
+    .item .topline{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .item .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+    .tag{padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:11px;color:var(--muted)}
+    a{color:#ffd5d5;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .small{font-size:12px}
+    .kpi{font-weight:900}
+    .hr{height:1px;background:var(--line);margin:12px 0}
+    .toast{
+      position:fixed;left:50%;transform:translateX(-50%);
+      bottom:110px; background:rgba(20,20,35,.92);
+      border:1px solid var(--line);
+      padding:10px 12px;border-radius:999px;
+      display:none; gap:8px; align-items:center;
+      box-shadow: var(--shadow);
+      max-width:90%;
+    }
+    .toast.show{display:flex}
+    .toast .b{width:8px;height:8px;border-radius:50%;background:var(--good)}
+    /* Modal */
+    .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:50}
+    .modalBack.show{display:flex}
+    .modal{
+      width:min(720px, 100%);
+      background:linear-gradient(180deg, rgba(20,20,35,.98), rgba(12,12,20,.98));
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal .mh{padding:14px 14px 10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .x{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer}
+    .modal .mb{padding:0 14px 14px}
+    .danger{background:rgba(255,28,28,.10);border-color:rgba(255,28,28,.35)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">BH</div>
+        <div>
+          <h1>BladeHunters Hub</h1>
+          <div class="sub" id="subline">SUP дневник • команда • рейтинги</div>
+        </div>
+      </div>
+      <div class="pill"><span class="dot"></span><span id="status">offline</span></div>
+    </div>
+
+    <div id="view"></div>
+  </div>
+
+  <div class="nav">
+    <div class="tabs">
+      <div class="tab active" data-tab="home">Главная</div>
+      <div class="tab" data-tab="add">Добавить</div>
+      <div class="tab" data-tab="board">Рейтинг</div>
+      <div class="tab" data-tab="me">Профиль</div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span class="b"></span><span id="toastText">Ок</span></div>
+
+  <div class="modalBack" id="modalBack">
+    <div class="modal">
+      <div class="mh">
+        <div>
+          <div class="ttl" id="modalTitle">Редактировать тренировку</div>
+          <div class="muted small">Меняй данные — сохраняй</div>
+        </div>
+        <button class="x" onclick="closeModal()">✕</button>
+      </div>
+      <div class="mb" id="modalBody"></div>
+    </div>
+  </div>
+
+<script>
+  // ===== НАСТРОЙКА API =====
+  // Если backend будет на Render — поменяй тут URL на свой https://...
+  const API_URL = "http://localhost:3000";
+
+  // ===== Telegram =====
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  // ===== State =====
+  const state = {
+    tab: "home",
+    token: localStorage.getItem("bh_token") || null,
+    team: localStorage.getItem("bh_team") || "Blade Hunters",
+    user: null,
+    me: null,
+    trainings: [],
+    leaderboards: null,
+  };
+
+  // ===== Helpers =====
+  function $(sel){ return document.querySelector(sel); }
+  function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function toast(msg){ $("#toastText").textContent = msg; $("#toast").classList.add("show"); setTimeout(()=>$("#toast").classList.remove("show"), 2200); }
+  function fmtDate(iso){ try { return new Date(iso).toLocaleString(); } catch { return iso; } }
+  function paceLabel(sec){
+    if(!sec || sec<=0) return "—";
+    const m = Math.floor(sec/60), s = sec%60;
+    return `${m}:${String(s).padStart(2,'0')} /км`;
+  }
+  function authHeaders(){
+    return state.token ? { "Authorization": "Bearer " + state.token } : {};
+  }
+
+  async function api(path, opts={}){
+    const res = await fetch(API_URL + path, {
+      ...opts,
+      headers: { "Content-Type": "application/json", ...(opts.headers||{}), ...authHeaders() }
+    });
+    const txt = await res.text();
+    let data = null;
+    try { data = txt ? JSON.parse(txt) : null; } catch { data = { raw: txt }; }
+    if(!res.ok) throw new Error(data?.error || txt || ("HTTP " + res.status));
+    return data;
+  }
+
+  async function checkHealth(){
+    try{
+      const r = await fetch(API_URL + "/health");
+      const j = await r.json();
+      $("#status").textContent = j.ok ? "online" : "offline";
+      $(".dot").style.background = j.ok ? "var(--good)" : "var(--red)";
+    }catch(e){
+      $("#status").textContent = "offline";
+      $(".dot").style.background = "var(--red)";
+    }
+  }
+
+  // ===== Auth flow =====
+  async function ensureAuth(){
+    // Read Telegram user (if inside Telegram). If not — allow demo mode.
+    const u = tg?.initDataUnsafe?.user || null;
+    state.user = u;
+
+    if(!state.token){
+      renderLogin();
+      return false;
+    }
+    return true;
+  }
+
+  async function doLogin(){
+    const team = $("#team").value.trim() || "Blade Hunters";
+    state.team = team;
+    localStorage.setItem("bh_team", team);
+
+    const u = tg?.initDataUnsafe?.user;
+    if(!u){
+      toast("Открой внутри Telegram, чтобы авторизация сработала.");
+      return;
+    }
+    const payload = {
+      telegram_id: u.id,
+      username: u.username || null,
+      first_name: u.first_name || null,
+      last_name: u.last_name || null,
+      photo_url: u.photo_url || null,
+      team
+    };
+    const r = await api("/auth", { method:"POST", body: JSON.stringify(payload), headers: {} });
+    state.token = r.token;
+    localStorage.setItem("bh_token", r.token);
+    toast("Ты внутри ✅");
+    await loadAll();
+    render();
+  }
+
+  function logout(){
+    localStorage.removeItem("bh_token");
+    state.token = null;
+    state.me = null;
+    state.trainings = [];
+    state.leaderboards = null;
+    toast("Вышел");
+    renderLogin();
+  }
+
+  // ===== Data loads =====
+  async function loadAll(){
+    await Promise.all([loadMe(), loadTrainings(), loadLeaderboards()]);
+  }
+  async function loadMe(){
+    state.me = await api("/me");
+  }
+  async function loadTrainings(){
+    const r = await api("/trainings");
+    state.trainings = r.trainings || [];
+  }
+  async function loadLeaderboards(){
+    const r = await api("/leaderboards/weekly?team=" + encodeURIComponent(state.team));
+    state.leaderboards = r;
+  }
+
+  // ===== UI render =====
+  function setTab(tab){
+    state.tab = tab;
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+    render();
+  }
+
+  function renderLogin(){
+    const u = tg?.initDataUnsafe?.user;
+    const name = u ? `${u.first_name||""} ${u.last_name||""}`.trim() : "Гость (не Telegram)";
+    const uname = u?.username ? "@"+u.username : "—";
+    $("#view").innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">Добро пожаловать</div>
+              <div class="muted">Вход через Telegram</div>
+            </div>
+            <span class="tag">v2</span>
+          </div>
+          <div class="bd">
+            <div class="muted">Пользователь:</div>
+            <div style="margin-top:6px;font-weight:900">${esc(name)}</div>
+            <div class="muted small">${esc(uname)}</div>
+
+            <label>Команда</label>
+            <input id="team" value="${esc(state.team)}" placeholder="Blade Hunters" />
+
+            <div class="row" style="margin-top:12px">
+              <button class="btn primary" onclick="doLogin()">Войти</button>
+              <button class="btn ghost" onclick="checkHealth().then(()=>toast('Проверил сервер'))">Проверить сервер</button>
+            </div>
+
+            <div class="hr"></div>
+            <div class="muted small">
+              Если ты видишь offline — значит backend не запущен или другой URL.<br/>
+              Для нормальной работы открой Mini App внутри Telegram.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderHome(){
+    const me = state.me;
+    const name = state.user ? `${state.user.first_name||""} ${state.user.last_name||""}`.trim() : "Пользователь";
+    const totalKm = me?.stats?.total_km ?? 0;
+    const trainings = me?.stats?.trainings ?? 0;
+    const hours = me?.stats?.total_hours ?? 0;
+
+    const last3 = (state.trainings || []).slice(0,3).map(t => `
+      <div class="item">
+        <div class="topline">
+          <div class="kpi">${esc(fmtDate(t.started_at))}</div>
+          <span class="tag">${esc(t.distance_km)} км</span>
+        </div>
+        <div class="meta">
+          <span>⏱ ${esc(t.duration_min)} мин</span>
+          <span>⚡ ${esc(t.avg_speed_kmh)} км/ч</span>
+          ${t.avg_hr ? `<span>❤ ${esc(t.avg_hr)}</span>` : ""}
+          <span>🏁 ${esc(paceLabel(t.pace_sec_per_km))}</span>
+        </div>
+        <div class="small"><a href="${esc(t.track_url)}" target="_blank">Открыть трек</a></div>
+      </div>
+    `).join("");
+
+    $("#view").innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">Привет, ${esc(name)} 👋</div>
+              <div class="muted">Команда: <b>${esc(state.team)}</b></div>
+            </div>
+            <button class="x" onclick="logout()" title="Выйти">⎋</button>
+          </div>
+          <div class="bd">
+            <div class="stats">
+              <div class="stat"><div class="n">${esc(totalKm)}</div><div class="t">км всего</div></div>
+              <div class="stat"><div class="n">${esc(trainings)}</div><div class="t">тренировок</div></div>
+              <div class="stat"><div class="n">${esc(hours)}</div><div class="t">часов</div></div>
+            </div>
+            <div style="margin-top:12px">
+              <button class="btn primary" onclick="setTab('add')">Добавить тренировку</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">Последние тренировки</div>
+              <div class="muted">3 последних записи</div>
+            </div>
+            <span class="tag">История</span>
+          </div>
+          <div class="bd">
+            <div class="list">${last3 || `<div class="muted">Пока пусто. Добавь первую тренировку.</div>`}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAdd(){
+    const nowLocal = new Date();
+    const pad = (n)=>String(n).padStart(2,'0');
+    const localDT = `${nowLocal.getFullYear()}-${pad(nowLocal.getMonth()+1)}-${pad(nowLocal.getDate())}T${pad(nowLocal.getHours())}:${pad(nowLocal.getMinutes())}`;
+
+    $("#view").innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">Добавить тренировку</div>
+              <div class="muted">Просто, без спорных моментов</div>
+            </div>
+            <span class="tag">SUP</span>
+          </div>
+          <div class="bd">
+            <label>Дата и время</label>
+            <input id="f_started" type="datetime-local" value="${localDT}" />
+
+            <div class="row">
+              <div style="flex:1">
+                <label>Дистанция (км)</label>
+                <input id="f_km" inputmode="decimal" placeholder="например 7.5" />
+              </div>
+              <div style="flex:1">
+                <label>Длительность (мин)</label>
+                <input id="f_min" inputmode="numeric" placeholder="например 55" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div style="flex:1">
+                <label>Средняя скорость (км/ч)</label>
+                <input id="f_spd" inputmode="decimal" placeholder="например 8.2" />
+              </div>
+              <div style="flex:1">
+                <label>Средний пульс (опц.)</label>
+                <input id="f_hr" inputmode="numeric" placeholder="например 142" />
+              </div>
+            </div>
+
+            <label>Ссылка на трек (обязательно)</label>
+            <input id="f_url" placeholder="https://..." />
+
+            <div style="margin-top:12px">
+              <button class="btn primary" onclick="submitTraining()">Сохранить</button>
+              <div class="muted small" style="margin-top:8px">
+                Важно: ссылка должна начинаться с http/https — иначе запись не примется.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">История</div>
+              <div class="muted">Редактирование и удаление</div>
+            </div>
+            <span class="tag">CRUD</span>
+          </div>
+          <div class="bd" id="historyBox"></div>
+        </div>
+      </div>
+    `;
+    renderHistoryInto("#historyBox");
+  }
+
+  function renderHistoryInto(sel){
+    const box = document.querySelector(sel);
+    const items = state.trainings || [];
+    box.innerHTML = items.length ?
+      `<div class="list">` + items.map(t => `
+        <div class="item">
+          <div class="topline">
+            <div class="kpi">${esc(fmtDate(t.started_at))}</div>
+            <div style="display:flex;gap:8px">
+              <button class="x" onclick="openEdit('${esc(t.id)}')" title="Редактировать">✎</button>
+              <button class="x danger" onclick="removeTraining('${esc(t.id)}')" title="Удалить">🗑</button>
+            </div>
+          </div>
+          <div class="meta">
+            <span>📏 ${esc(t.distance_km)} км</span>
+            <span>⏱ ${esc(t.duration_min)} мин</span>
+            <span>⚡ ${esc(t.avg_speed_kmh)} км/ч</span>
+            ${t.avg_hr ? `<span>❤ ${esc(t.avg_hr)}</span>` : ""}
+            <span>🏁 ${esc(paceLabel(t.pace_sec_per_km))}</span>
+          </div>
+          <div class="small"><a href="${esc(t.track_url)}" target="_blank">Открыть трек</a></div>
+        </div>
+      `).join("") + `</div>`
+      : `<div class="muted">Пока пусто. Добавь тренировку выше.</div>`;
+  }
+
+  function renderBoard(){
+    const lb = state.leaderboards;
+    const ws = lb?.week_start ? new Date(lb.week_start).toLocaleDateString() : "—";
+    const we = lb?.week_end ? new Date(lb.week_end).toLocaleDateString() : "—";
+
+    function rowUser(u, extra){
+      const name = `${u.first_name||""} ${u.last_name||""}`.trim() || (u.username ? "@"+u.username : "Без имени");
+      const uname = u.username ? "@"+u.username : "";
+      return `
+        <div class="item">
+          <div class="topline">
+            <div>
+              <div class="kpi">${esc(name)}</div>
+              <div class="muted small">${esc(uname)} • ${esc(u.team||"")}</div>
+            </div>
+            ${extra}
+          </div>
+        </div>
+      `;
+    }
+
+    const kmTop = (lb?.kmTop || []).map((u, i) =>
+      rowUser(u, `<span class="tag">#${i+1} • <b>${esc(u.total_km)}</b> км</span>`)
+    ).join("");
+
+    const paceTop = (lb?.paceTop || []).map((u, i) =>
+      rowUser(u, `<span class="tag">#${i+1} • <b>${esc(paceLabel(u.best_pace_sec_per_km))}</b></span>`)
+    ).join("");
+
+    $("#view").innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">Рейтинг недели</div>
+              <div class="muted">${esc(ws)} → ${esc(we)} • фильтр по команде</div>
+            </div>
+            <span class="tag">${esc(state.team)}</span>
+          </div>
+          <div class="bd">
+            <label>Команда (фильтр рейтинга)</label>
+            <input id="team2" value="${esc(state.team)}" />
+            <div class="row" style="margin-top:10px">
+              <button class="btn primary" onclick="applyTeam()">Применить</button>
+              <button class="btn ghost" onclick="refreshBoard()">Обновить</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">ТОП — километраж</div>
+              <div class="muted">сумма дистанции за неделю</div>
+            </div>
+            <span class="tag">км</span>
+          </div>
+          <div class="bd">
+            <div class="list">${kmTop || `<div class="muted">Пока нет данных.</div>`}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">ТОП — быстрый темп</div>
+              <div class="muted">лучший темп за неделю (по тренировкам)</div>
+            </div>
+            <span class="tag">темп</span>
+          </div>
+          <div class="bd">
+            <div class="list">${paceTop || `<div class="muted">Пока нет данных.</div>`}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderMe(){
+    const me = state.me;
+    const u = me?.user;
+    const s = me?.stats;
+    const name = `${u?.first_name||""} ${u?.last_name||""}`.trim() || "—";
+    const uname = u?.username ? "@"+u.username : "—";
+
+    $("#view").innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div class="hd">
+            <div>
+              <div class="ttl">Профиль</div>
+              <div class="muted">Твои данные и статистика</div>
+            </div>
+            <span class="tag">me</span>
+          </div>
+          <div class="bd">
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="logo" style="width:54px;height:54px;border-radius:18px">BH</div>
+              <div>
+                <div class="kpi">${esc(name)}</div>
+                <div class="muted small">${esc(uname)}</div>
+                <div class="muted small">Команда: <b>${esc(u?.team||state.team)}</b></div>
+              </div>
+            </div>
+
+            <div class="stats" style="margin-top:12px">
+              <div class="stat"><div class="n">${esc(s?.total_km ?? 0)}</div><div class="t">км всего</div></div>
+              <div class="stat"><div class="n">${esc(s?.trainings ?? 0)}</div><div class="t">тренировок</div></div>
+              <div class="stat"><div class="n">${esc(s?.total_hours ?? 0)}</div><div class="t">часов</div></div>
+            </div>
+
+            <div class="hr"></div>
+
+            <label>Изменить команду</label>
+            <input id="team3" value="${esc(u?.team || state.team)}" />
+            <div class="row" style="margin-top:10px">
+              <button class="btn primary" onclick="applyTeamFromProfile()">Сохранить</button>
+              <button class="btn ghost" onclick="setTab('home')">Назад</button>
+            </div>
+
+            <div class="hr"></div>
+            <button class="btn danger" onclick="logout()">Выйти</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function render(){
+    if(!state.token){
+      renderLogin();
+      return;
+    }
+    if(state.tab === "home") return renderHome();
+    if(state.tab === "add") return renderAdd();
+    if(state.tab === "board") return renderBoard();
+    if(state.tab === "me") return renderMe();
+  }
+
+  // ===== Actions =====
+  async function submitTraining(){
+    const startedLocal = $("#f_started").value;
+    const km = $("#f_km").value.trim();
+    const min = $("#f_min").value.trim();
+    const spd = $("#f_spd").value.trim();
+    const hr = $("#f_hr").value.trim();
+    const url = $("#f_url").value.trim();
+
+    // validations (no спорных моментов)
+    if(!startedLocal) return toast("Выбери дату/время");
+    if(!km || Number(km) <= 0) return toast("Укажи дистанцию (км) > 0");
+    if(!min || Number(min) <= 0) return toast("Укажи длительность (мин) > 0");
+    if(!spd || Number(spd) <= 0) return toast("Укажи скорость (км/ч) > 0");
+    if(!url || !url.startsWith("http")) return toast("Нужна ссылка на трек (http/https)");
+
+    const started = new Date(startedLocal).toISOString();
+    const payload = {
+      started_at: started,
+      distance_km: Number(km),
+      duration_min: Number(min),
+      avg_speed_kmh: Number(spd),
+      avg_hr: hr ? Number(hr) : null,
+      track_url: url
+    };
+    try{
+      await api("/trainings", { method:"POST", body: JSON.stringify(payload) });
+      toast("Сохранено ✅");
+      $("#f_km").value = "";
+      $("#f_min").value = "";
+      $("#f_spd").value = "";
+      $("#f_hr").value = "";
+      $("#f_url").value = "";
+      await loadTrainings();
+      await loadMe();
+      renderAdd();
+    }catch(e){
+      toast("Ошибка: " + e.message);
+    }
+  }
+
+  async function refreshBoard(){
+    try{
+      await loadLeaderboards();
+      toast("Обновил");
+      renderBoard();
+    }catch(e){
+      toast("Ошибка: " + e.message);
+    }
+  }
+
+  async function applyTeam(){
+    const t = $("#team2").value.trim() || "Blade Hunters";
+    state.team = t;
+    localStorage.setItem("bh_team", t);
+    toast("Команда: " + t);
+    await refreshBoard();
+  }
+  async function applyTeamFromProfile(){
+    const t = $("#team3").value.trim() || "Blade Hunters";
+    state.team = t;
+    localStorage.setItem("bh_team", t);
+    toast("Команда обновлена. Перезайди, чтобы применилось в профиле.");
+    // Для MVP команда пользователя меняется при следующем /auth
+    // Можно сделать отдельный endpoint /me/team, но сейчас держим просто.
+    renderMe();
+  }
+
+  function openEdit(id){
+    const t = state.trainings.find(x => x.id === id);
+    if(!t) return;
+    $("#modalTitle").textContent = "Редактировать тренировку";
+    const dt = new Date(t.started_at);
+    const pad=(n)=>String(n).padStart(2,'0');
+    const localDT = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+
+    $("#modalBody").innerHTML = `
+      <label>Дата и время</label>
+      <input id="e_started" type="datetime-local" value="${esc(localDT)}" />
+
+      <div class="row">
+        <div style="flex:1">
+          <label>Дистанция (км)</label>
+          <input id="e_km" value="${esc(t.distance_km)}" />
+        </div>
+        <div style="flex:1">
+          <label>Длительность (мин)</label>
+          <input id="e_min" value="${esc(t.duration_min)}" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div style="flex:1">
+          <label>Скорость (км/ч)</label>
+          <input id="e_spd" value="${esc(t.avg_speed_kmh)}" />
+        </div>
+        <div style="flex:1">
+          <label>Пульс (опц.)</label>
+          <input id="e_hr" value="${esc(t.avg_hr ?? "")}" />
+        </div>
+      </div>
+
+      <label>Ссылка на трек</label>
+      <input id="e_url" value="${esc(t.track_url)}" />
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" onclick="saveEdit('${esc(id)}')">Сохранить</button>
+        <button class="btn ghost" onclick="closeModal()">Отмена</button>
+      </div>
+    `;
+    $("#modalBack").classList.add("show");
+  }
+
+  function closeModal(){ $("#modalBack").classList.remove("show"); }
+
+  async function saveEdit(id){
+    const startedLocal = $("#e_started").value;
+    const km = $("#e_km").value.trim();
+    const min = $("#e_min").value.trim();
+    const spd = $("#e_spd").value.trim();
+    const hr = $("#e_hr").value.trim();
+    const url = $("#e_url").value.trim();
+
+    if(!startedLocal) return toast("Выбери дату/время");
+    if(!km || Number(km) <= 0) return toast("Дистанция > 0");
+    if(!min || Number(min) <= 0) return toast("Минуты > 0");
+    if(!spd || Number(spd) <= 0) return toast("Скорость > 0");
+    if(!url || !url.startsWith("http")) return toast("Ссылка должна быть http/https");
+
+    const payload = {
+      started_at: new Date(startedLocal).toISOString(),
+      distance_km: Number(km),
+      duration_min: Number(min),
+      avg_speed_kmh: Number(spd),
+      avg_hr: hr ? Number(hr) : null,
+      track_url: url
+    };
+    try{
+      await api("/trainings/" + encodeURIComponent(id), { method:"PUT", body: JSON.stringify(payload) });
+      toast("Сохранено ✅");
+      closeModal();
+      await loadTrainings();
+      await loadMe();
+      render();
+    }catch(e){
+      toast("Ошибка: " + e.message);
+    }
+  }
+
+  async function removeTraining(id){
+    if(!confirm("Удалить тренировку?")) return;
+    try{
+      await api("/trainings/" + encodeURIComponent(id), { method:"DELETE" });
+      toast("Удалено");
+      await loadTrainings();
+      await loadMe();
+      render();
+    }catch(e){
+      toast("Ошибка: " + e.message);
+    }
+  }
+
+  // ===== Tabs wiring =====
+  document.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", async () => {
+      const tab = t.dataset.tab;
+      setTab(tab);
+      // lazy refresh
+      if(tab === "board") { try{ await loadLeaderboards(); }catch{} renderBoard(); }
+      if(tab === "home") { try{ await loadMe(); }catch{} renderHome(); }
+      if(tab === "add") { try{ await loadTrainings(); }catch{} renderAdd(); }
+      if(tab === "me") { try{ await loadMe(); }catch{} renderMe(); }
+    });
+  });
+
+  // ===== Boot =====
+  (async function boot(){
+    await checkHealth();
+    const ok = await ensureAuth();
+    if(ok){
+      try{
+        await loadAll();
+        toast("Готово");
+      }catch(e){
+        toast("Ошибка данных: " + e.message);
+      }
+      render();
+    }
+  })();
+</script>
+</body>
+</html>
